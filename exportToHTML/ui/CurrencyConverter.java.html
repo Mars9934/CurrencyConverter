@@ -1,0 +1,181 @@
+<html>
+<head>
+<title>CurrencyConverter.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #000080; font-weight: bold;}
+.s1 { color: #000000;}
+.s2 { color: #008000; font-weight: bold;}
+.s3 { color: #0000ff;}
+.s4 { color: #808080; font-style: italic;}
+.s5 { color: #808080; font-weight: bold; font-style: italic;}
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+CurrencyConverter.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span>ui;
+
+<span class="s0">import </span>Model.Converter;
+<span class="s0">import </span>Model.CurrencyParser;
+
+<span class="s0">import </span>javax.swing.*;
+<span class="s0">import </span>java.awt.*;
+<span class="s0">import </span>java.awt.event.*;
+<span class="s0">import </span>java.io.IOException;
+
+<span class="s0">public class </span>CurrencyConverter {
+    <span class="s0">private </span>JPanel Panel;
+    <span class="s0">private </span>JTextField textField1;
+    <span class="s0">private </span>JButton convertButton;
+    <span class="s0">private </span>JComboBox comboBox1;
+    <span class="s0">private </span>JComboBox comboBox2;
+    <span class="s0">private </span>JTextArea textArea1;
+    <span class="s0">private </span>JButton reverseButton;
+    <span class="s0">private </span>Double val;
+    <span class="s0">private </span>String fromCur;
+    <span class="s0">private </span>String toCur;
+
+    <span class="s0">public </span>CurrencyConverter() <span class="s0">throws </span>IOException {
+        CurrencyParser cp = <span class="s0">new </span>CurrencyParser(<span class="s2">&quot;&quot;</span>, <span class="s2">&quot;&quot;</span>);
+        getData(cp);
+        fromCur = cp.getCurrNames().get(<span class="s3">0</span>).substring(cp.getCurrNames().get(<span class="s3">0</span>).indexOf(<span class="s2">&quot;(&quot;</span>)).substring(<span class="s3">1</span>, <span class="s3">4</span>);
+        toCur = fromCur;
+
+        comboBox1.addActionListener(<span class="s0">new </span>ActionListener() {
+            <span class="s0">public void </span>actionPerformed(ActionEvent e) {
+                fromCur = (String) comboBox1.getSelectedItem();
+                fromCur = fromCur.substring(fromCur.indexOf(<span class="s2">&quot;(&quot;</span>)).substring(<span class="s3">1</span>, <span class="s3">4</span>);
+            }
+        });
+        comboBox2.addActionListener(<span class="s0">new </span>ActionListener() {
+            <span class="s0">public void </span>actionPerformed(ActionEvent e) {
+                toCur = (String) comboBox2.getSelectedItem();
+                toCur = toCur.substring(toCur.indexOf(<span class="s2">&quot;(&quot;</span>)).substring(<span class="s3">1</span>, <span class="s3">4</span>);
+            }
+        });
+        convertButton.addActionListener(<span class="s0">new </span>ActionListener() {
+            <span class="s0">public void </span>actionPerformed(ActionEvent e) {
+                CurrencyParser cp = <span class="s0">null</span>;
+                <span class="s0">try </span>{
+                    cp = <span class="s0">new </span>CurrencyParser(fromCur, toCur);
+                } <span class="s0">catch </span>(IOException e1) {
+                    e1.printStackTrace();
+                }
+                <span class="s0">try </span>{
+                    cp = <span class="s0">new </span>CurrencyParser(fromCur, toCur);
+                } <span class="s0">catch </span>(IOException e1) {
+                    e1.printStackTrace();
+                }
+                Converter c = <span class="s0">new </span>Converter(Double.toString(val));
+
+                String rate = <span class="s0">null</span>;
+                <span class="s0">try </span>{
+                    rate = cp.parseRate();
+                } <span class="s0">catch </span>(IOException e1) {
+                    e1.printStackTrace();
+                }
+
+                String newVal = String.format(<span class="s2">&quot;%.2f&quot;</span>, c.convVal(rate));
+                textArea1.setText(<span class="s2">&quot;Converted value:&quot; </span>+ <span class="s2">&quot; &quot; </span>+ newVal + <span class="s2">&quot; &quot; </span>+ toCur + <span class="s2">&quot;</span><span class="s0">\n\n</span><span class="s2">Rate: [1 &quot; </span>+ fromCur + <span class="s2">&quot; : &quot; </span>+ rate + <span class="s2">&quot; &quot; </span>+ toCur + <span class="s2">&quot;]&quot;</span>);
+            }
+        });
+        textField1.addFocusListener(<span class="s0">new </span>FocusAdapter() {
+            @Override
+            <span class="s0">public void </span>focusLost(FocusEvent e) {
+                <span class="s0">super</span>.focusLost(e);
+                <span class="s0">if </span>(!textField1.getText().equals(<span class="s2">&quot;&quot;</span>)) {
+                    val = Double.parseDouble(textField1.getText());
+                }
+            }
+        });
+        reverseButton.addActionListener(<span class="s0">new </span>ActionListener() {
+            <span class="s0">public void </span>actionPerformed(ActionEvent e) {
+                String selected = (String) comboBox1.getSelectedItem();
+                comboBox1.setSelectedItem(comboBox2.getSelectedItem());
+                comboBox2.setSelectedItem(selected);
+            }
+        });
+    }
+
+    <span class="s0">public static void </span>main(String[] args) <span class="s0">throws </span>IOException {
+        JFrame frame = <span class="s0">new </span>JFrame(<span class="s2">&quot;CurrencyConverter&quot;</span>);
+        frame.setContentPane(<span class="s0">new </span>CurrencyConverter().Panel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(<span class="s0">true</span>);
+
+    }
+
+    <span class="s0">private void </span>getData(CurrencyParser data) {
+        <span class="s0">for </span>(String s : data.getCurrNames()) {
+            comboBox1.addItem(s);
+            comboBox2.addItem(s);
+        }
+    }
+
+    {
+<span class="s4">// GUI initializer generated by IntelliJ IDEA GUI Designer</span>
+// &gt;&gt;&gt; IMPORTANT!! &lt;&lt;&lt;
+// DO NOT EDIT OR ADD ANY CODE HERE!
+        $$$setupUI$$$();
+    }
+
+    <span class="s4">/**</span>
+     * Method generated by IntelliJ IDEA GUI Designer
+     * &gt;&gt;&gt; IMPORTANT!! &lt;&lt;&lt;
+     * DO NOT edit this method OR call it in your code!
+     *
+     * <span class="s5">@noinspection </span><span class="s4">ALL</span>
+     */
+    <span class="s0">private void </span>$$$setupUI$$$() {
+        Panel = <span class="s0">new </span>JPanel();
+        Panel.setLayout(<span class="s0">new </span>com.intellij.uiDesigner.core.GridLayoutManager(<span class="s3">7</span>, <span class="s3">2</span>, <span class="s0">new </span>Insets(<span class="s3">0</span>, <span class="s3">0</span>, <span class="s3">0</span>, <span class="s3">0</span>), -<span class="s3">1</span>, -<span class="s3">1</span>));
+        textField1 = <span class="s0">new </span>JTextField();
+        textField1.setEditable(<span class="s0">true</span>);
+        textField1.setText(<span class="s2">&quot;&quot;</span>);
+        Panel.add(textField1, <span class="s0">new </span>com.intellij.uiDesigner.core.GridConstraints(<span class="s3">1</span>, <span class="s3">1</span>, <span class="s3">1</span>, <span class="s3">1</span>, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, <span class="s0">null</span>, <span class="s0">new </span>Dimension(<span class="s3">150</span>, -<span class="s3">1</span>), <span class="s0">null</span>, <span class="s3">0</span>, <span class="s0">false</span>));
+        <span class="s0">final </span>JLabel label1 = <span class="s0">new </span>JLabel();
+        label1.setText(<span class="s2">&quot;Converted amount:&quot;</span>);
+        Panel.add(label1, <span class="s0">new </span>com.intellij.uiDesigner.core.GridConstraints(<span class="s3">6</span>, <span class="s3">0</span>, <span class="s3">1</span>, <span class="s3">1</span>, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, <span class="s0">null</span>, <span class="s0">null</span>, <span class="s0">null</span>, <span class="s3">0</span>, <span class="s0">false</span>));
+        <span class="s0">final </span>JLabel label2 = <span class="s0">new </span>JLabel();
+        label2.setText(<span class="s2">&quot;CurrencyConverter v1.0 - Mars Wang&quot;</span>);
+        Panel.add(label2, <span class="s0">new </span>com.intellij.uiDesigner.core.GridConstraints(<span class="s3">0</span>, <span class="s3">0</span>, <span class="s3">1</span>, <span class="s3">2</span>, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, <span class="s0">null</span>, <span class="s0">new </span>Dimension(<span class="s3">146</span>, <span class="s3">44</span>), <span class="s0">null</span>, <span class="s3">0</span>, <span class="s0">false</span>));
+        <span class="s0">final </span>JLabel label3 = <span class="s0">new </span>JLabel();
+        label3.setText(<span class="s2">&quot;To&quot;</span>);
+        Panel.add(label3, <span class="s0">new </span>com.intellij.uiDesigner.core.GridConstraints(<span class="s3">3</span>, <span class="s3">0</span>, <span class="s3">1</span>, <span class="s3">1</span>, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, <span class="s0">null</span>, <span class="s0">null</span>, <span class="s0">null</span>, <span class="s3">0</span>, <span class="s0">false</span>));
+        <span class="s0">final </span>JLabel label4 = <span class="s0">new </span>JLabel();
+        label4.setText(<span class="s2">&quot;From&quot;</span>);
+        Panel.add(label4, <span class="s0">new </span>com.intellij.uiDesigner.core.GridConstraints(<span class="s3">2</span>, <span class="s3">0</span>, <span class="s3">1</span>, <span class="s3">1</span>, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, <span class="s0">null</span>, <span class="s0">null</span>, <span class="s0">null</span>, <span class="s3">0</span>, <span class="s0">false</span>));
+        <span class="s0">final </span>JLabel label5 = <span class="s0">new </span>JLabel();
+        label5.setText(<span class="s2">&quot;Value&quot;</span>);
+        Panel.add(label5, <span class="s0">new </span>com.intellij.uiDesigner.core.GridConstraints(<span class="s3">1</span>, <span class="s3">0</span>, <span class="s3">1</span>, <span class="s3">1</span>, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, <span class="s0">null</span>, <span class="s0">null</span>, <span class="s0">null</span>, <span class="s3">0</span>, <span class="s0">false</span>));
+        comboBox1 = <span class="s0">new </span>JComboBox();
+        Panel.add(comboBox1, <span class="s0">new </span>com.intellij.uiDesigner.core.GridConstraints(<span class="s3">2</span>, <span class="s3">1</span>, <span class="s3">1</span>, <span class="s3">1</span>, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, <span class="s0">null</span>, <span class="s0">null</span>, <span class="s0">null</span>, <span class="s3">0</span>, <span class="s0">false</span>));
+        comboBox2 = <span class="s0">new </span>JComboBox();
+        Panel.add(comboBox2, <span class="s0">new </span>com.intellij.uiDesigner.core.GridConstraints(<span class="s3">3</span>, <span class="s3">1</span>, <span class="s3">1</span>, <span class="s3">1</span>, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, <span class="s0">null</span>, <span class="s0">null</span>, <span class="s0">null</span>, <span class="s3">0</span>, <span class="s0">false</span>));
+        textArea1 = <span class="s0">new </span>JTextArea();
+        textArea1.setEditable(<span class="s0">false</span>);
+        textArea1.setText(<span class="s2">&quot;&quot;</span>);
+        Panel.add(textArea1, <span class="s0">new </span>com.intellij.uiDesigner.core.GridConstraints(<span class="s3">6</span>, <span class="s3">1</span>, <span class="s3">1</span>, <span class="s3">1</span>, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, <span class="s0">null</span>, <span class="s0">new </span>Dimension(<span class="s3">150</span>, <span class="s3">50</span>), <span class="s0">null</span>, <span class="s3">0</span>, <span class="s0">false</span>));
+        reverseButton = <span class="s0">new </span>JButton();
+        reverseButton.setText(<span class="s2">&quot;Reverse&quot;</span>);
+        Panel.add(reverseButton, <span class="s0">new </span>com.intellij.uiDesigner.core.GridConstraints(<span class="s3">4</span>, <span class="s3">0</span>, <span class="s3">1</span>, <span class="s3">1</span>, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, <span class="s0">null</span>, <span class="s0">null</span>, <span class="s0">null</span>, <span class="s3">0</span>, <span class="s0">false</span>));
+        convertButton = <span class="s0">new </span>JButton();
+        convertButton.setText(<span class="s2">&quot;Convert&quot;</span>);
+        Panel.add(convertButton, <span class="s0">new </span>com.intellij.uiDesigner.core.GridConstraints(<span class="s3">5</span>, <span class="s3">1</span>, <span class="s3">1</span>, <span class="s3">1</span>, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, <span class="s0">null</span>, <span class="s0">null</span>, <span class="s0">null</span>, <span class="s3">0</span>, <span class="s0">false</span>));
+    }
+
+    <span class="s4">/**</span>
+     * <span class="s5">@noinspection </span><span class="s4">ALL</span>
+     */
+    <span class="s0">public </span>JComponent $$$getRootComponent$$$() {
+        <span class="s0">return </span>Panel;
+    }
+}
+</pre>
+</body>
+</html>
