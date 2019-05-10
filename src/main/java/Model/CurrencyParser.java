@@ -23,7 +23,7 @@ public class CurrencyParser {
 
     public String parseRate() throws IOException {
         String ftCur = fromCur + "_" + toCur;
-        String u = "https://free.currencyconverterapi.com/api/v6/convert?q=" + ftCur + "&compact=ultra";
+        String u = "https://free.currconv.com/api/v7/convert?q=" + ftCur + "&compact=ultra&apiKey="; // API KEY REMOVED
         URL url = new URL(u);
         BufferedReader b = new BufferedReader(new InputStreamReader(url.openStream()));
         JSONObject s = new JSONObject(b.readLine());
@@ -33,7 +33,7 @@ public class CurrencyParser {
     public List<String> parseCurrNames() throws IOException {
         List<String> currNames = new ArrayList<String>();
 
-        URL u = new URL("https://free.currencyconverterapi.com/api/v6/currencies");
+        URL u = new URL("https://free.currconv.com/api/v7/currencies?apiKey="); // API KEY REMOVED
         BufferedReader b = new BufferedReader((new InputStreamReader(u.openStream())));
         String s = b.readLine();
 
